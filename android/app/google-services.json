@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "904469646630",
+    "project_id": "fitr-cd453",
+    "storage_bucket": "fitr-cd453.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:904469646630:android:33cc122e9d646cb0db05e7",
+        "android_client_info": {
+          "package_name": "com.example.fitrah"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "904469646630-bkkq5oh5npot4g4k25hqt21vjf4a0c80.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCz0LARvcEgIef88RsaKMsOgKNrbRZS8Z4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "904469646630-bkkq5oh5npot4g4k25hqt21vjf4a0c80.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

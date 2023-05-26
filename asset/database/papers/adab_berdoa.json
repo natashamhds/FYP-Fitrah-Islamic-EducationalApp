@@ -1,0 +1,64 @@
+{
+    "id": "ppr001",
+    "title": "Adab Solat",
+    "description": "Adab solat ialah...",
+    "questions": [
+        {
+            "id": "ppr001q001",
+            "question": "Apakah maksud berdoa?",
+            "answer": [
+                {
+                    "identifier": "A",
+                    "answer": "Perbuatan hamba memohon sesuatu kepada manusia"
+                },
+                {
+                    "identifier": "B",
+                    "answer": "Perbuatan hamba memohon sesuatu kepada ibu bapa"
+                },
+                {
+                    "identifier": "C",
+                    "answer": "Perbuatan hamba memohon sesuatu kepada Allah"
+                }
+            ],
+                "correct_answer": "C"
+        },
+        {
+            "id": "ppr001q002",
+            "question": "Apakah antara adab berdoa?",
+            "answer": [
+                {
+                    "identifier": "A",
+                    "answer": "Mengangkat kedua-dua belah tangan semasa berdoa"
+                },
+                {
+                    "identifier": "B",
+                    "answer": "Berdoa di dalam tandas"
+                },
+                {
+                    "identifier": "C",
+                    "answer": "Berdoa untuk keburukan orang lain"
+                }
+            ],
+                "correct_answer": "A"
+        },
+        {
+            "id": "ppr001q003",
+            "question": "Apakah antara adab berdoa?",
+            "answer": [
+                {
+                    "identifier": "A",
+                    "answer": "Membentuk sikap sombong dengan manusia lain"
+                },
+                {
+                    "identifier": "B",
+                    "answer": "Membentuk sikap berusaha dengan bersungguh-sungguh"
+                },
+                {
+                    "identifier": "C",
+                    "answer": "Tidak berharap dengan Allah"
+                }
+            ],
+                "correct_answer": "B"
+        }
+    ]
+  }

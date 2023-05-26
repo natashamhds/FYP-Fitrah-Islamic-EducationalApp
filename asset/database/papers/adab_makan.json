@@ -1,0 +1,21 @@
+[
+    {
+        "1": "Apakah antara adab makan?",
+        "2": "Apakah faedah adab makan?",
+        "3": "Mengapakah kita harus mengamalkan adab makan?"
+    },
+    {
+        "1": {
+            "Membaca doa makan": true,
+            "Menggunakan tangan kiri": false
+        },
+        "2": {
+            "Sihat tubuh badan": true,
+            "Tidak disukai oleh kawan-kawan dan keluarga": false
+        },
+        "3": {
+            "Supaya membazir masa sebelum makan": false,
+            "Supaya sentiasa bersyukur dengan rezeki Allah": true
+        }
+    }
+]
