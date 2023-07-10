@@ -1,35 +1,34 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:confetti/confetti.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitrah/config/configScheme.dart';
 import 'package:fitrah/pages/Home/main_page.dart';
 import 'package:fitrah/widgets/app_large_text.dart';
-import 'package:fitrah/widgets/app_text.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ScorePage extends StatefulWidget {
-  const ScorePage({
-    Key? key,
-    required this.title,
-    required this.result,
-    required this.questionLength,
-  }) : super(key: key);
+  const ScorePage(
+      {Key? key,
+      required this.title,
+      required this.result,
+      required this.questionLength,
+      required this.childName})
+      : super(key: key);
 
-  final String title;
-
-  final int result;
+  final String childName;
   final int questionLength;
+  final int result;
+  final String title;
 
   @override
   State<ScorePage> createState() => _ScorePageState();
 }
 
 class _ScorePageState extends State<ScorePage> {
+  final player = AudioPlayer();
   final confettiController = ConfettiController();
-  AudioPlayer audio = AudioPlayer();
 
   @override
   void dispose() {
@@ -38,10 +37,32 @@ class _ScorePageState extends State<ScorePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    confettiController.play();
+    player.play(AssetSource('audio/Yay!.mp3'), volume: 10);
+    // initState can only return void, therefore cannot be marked as async
+    saveScore(widget.title, widget.childName, widget.result);
+  }
+
+  saveScore(String title, String childName, int result) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    var newAnakScore = {
+      'anakName': widget.childName,
+      'subjectName': widget.title,
+      'subjectScore':
+          "${((widget.result / widget.questionLength) * 100).toInt()}"
+    };
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('anak')
+        .add(newAnakScore);
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    audio.setAsset('asset/audio/Yay!.mp3');
-    
     return Scaffold(
       backgroundColor: lightBlue,
       appBar: AppBar(
@@ -76,14 +97,16 @@ class _ScorePageState extends State<ScorePage> {
               gravity: 0.01,
               emissionFrequency: 0.01,
             ),
-            AppLargeText(text: "TAHNIAH !"),
+            AppLargeText(text: "TAHNIAH"),
+            const SizedBox(height: 10),
+            AppLargeText(text: "${widget.childName.toUpperCase()} !"),
             const SizedBox(height: 18),
             Container(
               width: size.width,
               height: size.width * 0.56,
               decoration: const BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage('asset/images/success.png'),
+                      image: AssetImage('assets/images/success.png'),
                       fit: BoxFit.contain)),
             ),
             const SizedBox(height: 25),
@@ -94,7 +117,7 @@ class _ScorePageState extends State<ScorePage> {
                 decoration: BoxDecoration(
                     color: lightBlue, borderRadius: BorderRadius.circular(20)),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       decoration: BoxDecoration(
@@ -119,7 +142,15 @@ class _ScorePageState extends State<ScorePage> {
                         ),
                       ),
                     ),
-                    AppText(text: widget.title, color: darkBlue, size: 20)
+                    Expanded(
+                        child: Text(widget.title,
+                            style: TextStyle(
+                                color: darkBlue,
+                                fontSize: 20,
+                                fontFamily: 'circe'),
+                            softWrap: true,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis))
                   ],
                 ),
               ),
@@ -139,21 +170,5 @@ class _ScorePageState extends State<ScorePage> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    updateScore(widget.title);
-    confettiController.play();
-    audio.play();
-  }
-
-  Future updateScore(String score) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    DocumentReference userDocRef =
-        FirebaseFirestore.instance.collection('users').doc(currentUser!.uid);
-    DocumentReference docRef = userDocRef.collection('anak').doc();
-    docRef.update({'score.${widget.title}': widget.result});
   }
 }
