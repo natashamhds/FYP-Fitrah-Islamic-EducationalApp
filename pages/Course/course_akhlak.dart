@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CourseAkhlak extends StatefulWidget {
+  const CourseAkhlak(
+      {super.key, required this.title, required this.documentSnapshot});
+
   final DocumentSnapshot documentSnapshot;
   final String title;
-
-  const CourseAkhlak({super.key, required this.title, required this.documentSnapshot});
 
   @override
   State<CourseAkhlak> createState() => _CourseAkhlakState();
@@ -52,62 +53,149 @@ class _CourseAkhlakState extends State<CourseAkhlak> {
           ),
         ),
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(40), topLeft: Radius.circular(40))),
-        child: Column(children: [
-          const SizedBox(height: 20),
-          AppLargeText(
-              text: widget.documentSnapshot['title'].toUpperCase(),
-              size: 25,
-              color: darkBlue),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 9),
-            child: YoutubePlayer(
-              controller: _controller,
-              showVideoProgressIndicator: true,
-              bottomActions: [
-                CurrentPosition(),
-                ProgressBar(
-                  isExpanded: true,
-                  colors: ProgressBarColors(
-                      playedColor: yellow, handleColor: yellow),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          AppText(
-              text: widget.documentSnapshot['description'].replaceAll('\\n', '\n'), size: 25),
-          // StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          //   stream: FirebaseFirestore.instance
-          //       .collection('courses')
-          //       .doc(widget.title)
-          //       .snapshots(),
-          //   builder: (BuildContext context,
-          //       AsyncSnapshot<DocumentSnapshot> snapshot) {
-          //     if (snapshot.hasError) {
-          //       return const Text('Something went wrong');
-          //     }
-          //     if (snapshot.connectionState == ConnectionState.waiting) {
-          //       return const Text("Loading");
-          //     }
-          //     Map<String, dynamic> data =
-          //         snapshot.data!.data()! as Map<String, dynamic>;
-          //     return ListView(
-          //         children: data['arrayOfString'].map<Widget>((e) {
-          //       return ListTile(
-          //         title: Text(e.toString()),
-          //       );
-          //     }).toList());
-          //   },
-          // ),
-        ]),
+      body: SingleChildScrollView(
+        child: Container(
+            decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40))),
+            child: Column(children: [
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.center,
+                child: AppLargeText(
+                    text: widget.documentSnapshot['title'].toUpperCase(),
+                    size: 25,
+                    color: darkBlue),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 9),
+                child: YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: true,
+                  bottomActions: [
+                    CurrentPosition(),
+                    ProgressBar(
+                      isExpanded: true,
+                      colors: ProgressBarColors(
+                          playedColor: yellow, handleColor: yellow),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 9.0),
+                child: Column(
+                  children: [
+                    AppText(
+                        text: widget.documentSnapshot['description']
+                            .replaceAll('\\n', '\n'),
+                        size: 25),
+                    const SizedBox(height: 20),
+                    Text(widget.documentSnapshot['doa title'],
+                        style: const TextStyle(fontSize: 18)),
+                    Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                            color: yellow,
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Align(
+                            alignment: Alignment.centerRight,
+                            child: AppText(
+                                text: (widget.documentSnapshot.data()
+                                        as Map)['doa'] ??
+                                    '',
+                                size: 25))),
+                    const SizedBox(height: 10),
+                    const Text("Rumi:", style: TextStyle(fontSize: 18)),
+                    Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                            color: Colors.pink.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: Align(
+                            alignment: Alignment.center,
+                            child: AppText(
+                                text: (widget.documentSnapshot.data()
+                                        as Map)['doa rumi'] ??
+                                    '',
+                                size: 22))),
+                    const SizedBox(height: 10),
+                    const Text("Maksudnya:", style: TextStyle(fontSize: 18)),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                          color: purple.withOpacity(0.45),
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: AppText(
+                            text: (widget.documentSnapshot.data()
+                                    as Map)['maksud doa'] ??
+                                '',
+                            size: 22),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    if ((widget.documentSnapshot.data() as Map<String, dynamic>)
+                        .containsKey(
+                            'doa1')) // check whether the documentSnapshot has 2 doa field
+                      Column(
+                        children: [
+                          Text(widget.documentSnapshot['doa title1'],
+                              style: const TextStyle(fontSize: 18)),
+                          Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: yellow,
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Align(
+                                  alignment: Alignment.center,
+                                  child: AppText(
+                                      text: (widget.documentSnapshot.data()
+                                              as Map)['doa1'] ??
+                                          '',
+                                      size: 25))),
+                          const SizedBox(height: 10),
+                          const Text("Rumi:", style: TextStyle(fontSize: 18)),
+                          Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  color: Colors.pink.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Align(
+                                  alignment: Alignment.center,
+                                  child: AppText(
+                                      text: (widget.documentSnapshot.data()
+                                              as Map)['doa rumi1'] ??
+                                          '',
+                                      size: 22))),
+                          const SizedBox(height: 10),
+                          const Text("Maksudnya:",
+                              style: TextStyle(fontSize: 18)),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                                color: purple.withOpacity(0.45),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: AppText(
+                                  text: (widget.documentSnapshot.data()
+                                          as Map)['maksud doa1'] ??
+                                      '',
+                                  size: 22),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              )
+            ])),
       ),
     );
   }
