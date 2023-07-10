@@ -1,22 +1,25 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitrah/config/configScheme.dart';
 import 'package:fitrah/model/question_model.dart';
-import 'package:fitrah/pages/Home/main_page.dart';
 import 'package:fitrah/pages/Quiz/score_page.dart';
 import 'package:fitrah/widgets/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:just_audio/just_audio.dart';
 
 import 'component/question_card.dart';
 
 class QuizPage extends StatefulWidget {
-  final DocumentSnapshot documentSnapshot;
   const QuizPage(
-      {super.key, required this.documentSnapshot, required this.question});
+      {super.key,
+      required this.documentSnapshot,
+      required this.question,
+      required this.childName});
 
+  final String childName;
+  final DocumentSnapshot documentSnapshot;
   final List<Question> question;
 
   @override
@@ -24,13 +27,21 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  late int currentTime;
-  late Timer timer;
+  final player = AudioPlayer();
+  final audio = AudioPlayer();
   int currentIndex = 0;
+  bool isAnswerSelected = false;
+  late int currentTime;
   int score = 0;
   String selectedAns = '';
-  bool isSelected = false;
-  AudioPlayer audio = AudioPlayer();
+  late Timer timer;
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+    player.stop();
+  }
 
   @override
   void initState() {
@@ -46,23 +57,15 @@ class _QuizPageState extends State<QuizPage> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => ScorePage(
-              title: widget.documentSnapshot['title'],
-              result: score,
-              questionLength: widget.question.length,
-            ),
+                title: widget.documentSnapshot['title'],
+                result: score,
+                questionLength: widget.question.length,
+                childName: widget.childName),
           ),
         );
       }
     });
-    audio.setAsset('asset/audio/timer.mp3');
-    audio.play();
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-    audio.stop();
+    setAudio();
   }
 
   @override
@@ -77,17 +80,6 @@ class _QuizPageState extends State<QuizPage> {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context,
-                MaterialPageRoute(builder: (context) => const MainPage()));
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-            size: 30,
-          ),
-        ),
       ),
       body: Container(
         width: double.infinity,
@@ -128,7 +120,6 @@ class _QuizPageState extends State<QuizPage> {
                   itemCount: currentQuestion.answers.length,
                   itemBuilder: (context, index) {
                     final answer = currentQuestion.answers[index];
-                    // return Option(option: answer, color: selectedAns == answer && answer == currentQuestion.correctAnswer ? correct : neutral);
                     return AnswerTile(
                       isAlreadySelected: answer == selectedAns,
                       answer: answer,
@@ -136,20 +127,24 @@ class _QuizPageState extends State<QuizPage> {
                       onTap: () {
                         setState(() {
                           selectedAns = answer;
+                          isAnswerSelected = true;
                         });
                         if (answer == currentQuestion.correctAnswer) {
                           score++;
+                          audio.play(AssetSource('audio/correctAnswer.mp3'));
                           HapticFeedback.selectionClick();
+                        } else {
+                          audio.play(AssetSource('audio/wrongAnswer.mp3'));
                         }
                         Future.delayed(const Duration(milliseconds: 4000), () {
                           if (currentIndex == widget.question.length - 1) {
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) => ScorePage(
-                                  title: widget.documentSnapshot['title'],
-                                  result: score,
-                                  questionLength: widget.question.length,
-                                ),
+                                    title: widget.documentSnapshot['title'],
+                                    result: score,
+                                    questionLength: widget.question.length,
+                                    childName: widget.childName),
                               ),
                             );
                             return;
@@ -158,7 +153,9 @@ class _QuizPageState extends State<QuizPage> {
                             currentIndex++;
                             selectedAns = '';
                           });
+                          player.resume();
                         });
+                        player.pause();
                       },
                     );
                   }),
@@ -171,6 +168,11 @@ class _QuizPageState extends State<QuizPage> {
       ),
     );
   }
+
+  Future setAudio() async {
+    player.setReleaseMode(ReleaseMode.loop);
+    player.play(AssetSource('audio/timer.mp3'));
+  }
 }
 
 class AnswerTile extends StatelessWidget {
@@ -182,10 +184,20 @@ class AnswerTile extends StatelessWidget {
       required this.onTap})
       : super(key: key);
 
-  final bool isAlreadySelected;
   final String answer;
   final String correctAnswer;
+  final bool isAlreadySelected;
   final Function onTap;
+
+  Color get cardColor {
+    if (!isAlreadySelected) {
+      return neutral;
+    }
+    if (answer == correctAnswer) {
+      return correct;
+    }
+    return incorrect;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,15 +221,5 @@ class AnswerTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color get cardColor {
-    if (!isAlreadySelected) {
-      return neutral;
-    }
-    if (answer == correctAnswer) {
-      return correct;
-    }
-    return incorrect;
   }
 }
